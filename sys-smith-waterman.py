@@ -11,50 +11,31 @@ Date: April 2020
 """
 
 
+#PELICAN and COELACANTH 
+
+
 #import numpy for matrix generation and handling
 import numpy as np
-import sys 
-
-file1 = sys.argv[1]
-file2 = sys.argv[2]
+import sys
 
 
-
-
-#Read in Sequence1.fasta and Sequence2.fasta
-#files 
-
-
-with open(file1) as in_file1:  
-    for line1 in in_file1.readlines(): 
-        seq1 = line1.rstrip()
- 
+def fasta_reader(inp):  
+   
+    """
+    Fasta file reader.
     
-with open(file2) as in_file2:  
-    for line2 in in_file2.readlines(): 
-        if line2.startswith("A" or "T" or "C" or "G"):
-            seq2 = line2.rstrip()
+    Returns string of nucleotide sequnce present in the fasta file.
+    This needs to be called once for each fasta file. 
+    
+    """
 
-
-#Add space to sequences. This is done to 
-#create correct number of rows and collumns
-#in the scoring matrix
-
-
-strB = ' '+seq1
-strA = ' '+seq2
-
-
-
-#Reverse the order of the sequence. This is done
-#simpify the Backtracer function.
-
-
-strA = strA[::-1]
-strB = strB[::-1]
-
-
-
+    with open(inp) as in_file:  
+        for line in in_file.readlines():
+            if line.startswith("A" or "T" or "C" or "G"):
+                seq = line.rstrip()
+                return(seq)
+                
+                
 def scr_calc(m,i,j):  
    
     """
@@ -93,8 +74,6 @@ def backtracer(i, j, i_align, j_align):
     diag = matrix[i-1][j-1]
     up = matrix[i-1][j]
     left = matrix[i][j-1]
-
-
 
 
     while diag > 0 or up > 0 or left > 0:
@@ -147,8 +126,36 @@ def backtracer(i, j, i_align, j_align):
             break
 
 
-#Create matrix with zeros 
+#Read in the two sequences
             
+inp1 = sys.argv[1]
+inp2 = sys.argv[2]
+ 
+strA = ''
+strB = ''       
+
+strA = fasta_reader(inp1)
+strB = fasta_reader(inp2)
+
+
+#Add space to sequences. This is done to 
+#create correct number of rows and collumns
+#in the scoring matrix
+
+
+strB = ' '+strB
+strA = ' '+strA
+
+
+#Reverse the order of the sequence. This is done
+#simpify the Backtracer function.
+
+
+strA = strA[::-1]
+strB = strB[::-1]
+
+
+#Create matrix with zeros 
 matrix = np.zeros((len(strA),len(strB)))
  
 #Initialise matrix using scr_calc funciton   
@@ -174,8 +181,7 @@ max_scrs = np.amax(matrix)
 start = np.where(matrix == max_scrs)
  
 
-#take integer values of i and j
-
+#take integer values of coordinates with max score
 
 i = int(start[0])
 j = int(start[1])    
@@ -201,3 +207,6 @@ ali_2 =''.join(j_align)
 
 print ("Sequence1",ali_1)
 print ("Sequence2",ali_2)
+
+
+quit()
